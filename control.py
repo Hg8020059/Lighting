@@ -14,7 +14,7 @@ LED_PIN        = 18      # GPIO pin connected to the pixels (18 uses PWM!).
 #LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
 LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA        = 10      # DMA channel to use for generating a signal (try 10)
-LED_BRIGHTNESS = 65      # Set to 0 for darkest and 255 for brightest
+LED_BRIGHTNESS = 100      # Set to 0 for darkest and 255 for brightest
 LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
 LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
@@ -52,7 +52,9 @@ if __name__ == '__main__':
         # Set to red
         fill(strip, Color(255, 0, 0))
         time.sleep(2)
-        strip.setBrightness(10);
+        for i in range(LED_BRIGHTNESS, 0, 1):
+            strip.setBrightness(i);
+            time.sleep(0.1)
         while(True):
             pass
 
