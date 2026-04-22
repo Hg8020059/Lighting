@@ -38,7 +38,7 @@ def flashbang(strip):
     strip.setBrightness(255)
     fill(strip, Color(255, 255, 255))
     time.sleep(0.45)
-    for i in range(LED_BRIGHTNESS, -1, -1):
+    for i in range(255, -1, -1):
         strip.setBrightness(i)
         strip.show()
         time.sleep(0.01)
