@@ -9,7 +9,7 @@ from rpi_ws281x import *
 import argparse
 
 # LED strip configuration:
-LED_COUNT      = 30     # Number of LED pixels.
+LED_COUNT      = 60     # Number of LED pixels.
 LED_PIN        = 18      # GPIO pin connected to the pixels (18 uses PWM!).
 #LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
 LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
@@ -51,6 +51,10 @@ if __name__ == '__main__':
     try:
         # Set to red
         fill(strip, Color(255, 0, 0))
+        time.sleep(2)
+        strip.setBrightness(10);
+        while(True):
+            pass
 
     except KeyboardInterrupt:
         colorWipe(strip, Color(0,0,0), 10)
