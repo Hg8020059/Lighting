@@ -22,11 +22,17 @@ LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
 # Define functions which animate LEDs in various ways.
 def colorWipe(strip, color, wait_ms=50):
-    """Wipe color across display a pixel at a time."""
+    #Wipe color across display a pixel at a time.
     for i in range(strip.numPixels()):
         strip.setPixelColor(i, color)
         strip.show()
         time.sleep(wait_ms/1000.0)
+        
+def fill(strip, color):
+    #Set all pixels to a color
+    for i in range(strip.numPixels()):
+        strip.setPixelColor(i, color)
+    strip.show()
 
 # Main program logic follows:
 if __name__ == '__main__':
@@ -43,8 +49,8 @@ if __name__ == '__main__':
     print ('Press Ctrl-C to quit.')
 
     try:
-        print ('Color wipe animations.')
-        strip.fill((Color(255,0,0), 0, strip.numPixels() - 1))  # Red
+        # Set to red
+        fill(strip, Color(255, 0, 0))
 
     except KeyboardInterrupt:
         colorWipe(strip, Color(0,0,0), 10)
