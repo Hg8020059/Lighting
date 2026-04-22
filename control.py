@@ -52,9 +52,10 @@ if __name__ == '__main__':
         # Set to red
         fill(strip, Color(255, 0, 0))
         time.sleep(2)
-        for i in range(LED_BRIGHTNESS, 0, 1):
-            strip.setBrightness(i);
-            time.sleep(0.1)
+        for i in range(LED_BRIGHTNESS, -1, -1):
+            strip.setBrightness(i)
+            strip.show()
+            time.sleep(0.05)
         while(True):
             pass
 
