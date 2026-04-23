@@ -1,63 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LED Controller</title>
+    <title>LED Color Picker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        body { font-family: sans-serif; text-align: center; margin-top: 50px; background-color: #222; color: white; }
-        .control-group { margin: 30px; padding: 20px; background-color: #333; border-radius: 10px; display: inline-block; }
-        button { padding: 15px 30px; font-size: 18px; background-color: #ff4757; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        button:active { background-color: #ff6b81; }
-        input[type="range"] { width: 200px; }
-        input[type="color"] { width: 100px; height: 50px; cursor: pointer; border: none; background: none; }
+        body { font-family: sans-serif; text-align: center; background: #1a1a1a; color: white; padding-top: 50px; }
+        input[type="color"] { 
+            width: 80%; max-width: 300px; height: 200px; 
+            border: none; cursor: pointer; background: none;
+        }
+        h1 { margin-bottom: 40px; }
     </style>
 </head>
 <body>
-
-    <h1>LED Control Panel</h1>
-
-    <div class="control-group">
-        <h3>Flashbang</h3>
-        <button onclick="triggerFlashbang()">Deploy</button>
-    </div>
-
-    <div class="control-group">
-        <h3>Brightness</h3>
-        <input type="range" id="brightnessSlider" min="0" max="255" value="100" onchange="changeBrightness(this.value)">
-    </div>
-
-    <div class="control-group">
-        <h3>Solid Color</h3>
-        <input type="color" id="colorPicker" value="#ff0000" onchange="changeColor(this.value)">
-    </div>
+    <h1>Select LED Color</h1>
+    <input type="color" id="picker" value="#00ff00">
 
     <script>
-        // Sends the POST request for the flashbang
-        function triggerFlashbang() {
-            fetch('/api/flashbang', { method: 'POST' });
-            // Note: Your flashbang function ends at 0 brightness. 
-            // We update the slider visually to match the new hardware state.
-            document.getElementById('brightnessSlider').value = 0; 
-        }
-
-        // Sends the POST request when the slider is moved
-        function changeBrightness(value) {
-            fetch('/api/brightness', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ brightness: value })
-            });
-        }
-
-        // Sends the POST request when a color is picked
-        function changeColor(hexValue) {
+        const picker = document.getElementById('picker');
+        
+        // Using 'change' instead of 'input' so it only sends 
+        // the command when you let go of the mouse/finger.
+        picker.addEventListener('change', (e) => {
             fetch('/api/color', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ color: hexValue })
-            });
-        }
+                body: JSON.stringify({ color: e.target.value })
+            })
+            .then(response => response.json())
+            .then(data => console.log('Success:', data))
+            .catch(error => console.error('Error:', error));
+        });
     </script>
 </body>
 </html>
