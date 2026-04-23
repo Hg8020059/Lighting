@@ -1,33 +1,38 @@
 import re
+import os
 from flask import Flask, request, jsonify, render_template
 
 app = Flask(__name__)
 
-def hex_to_color(hex_string):
-    hex_string = hex_string.lstrip('#')
-    r, g, b = tuple(int(hex_string[i:i+2], 16) for i in (0, 2, 4))
-    # Note: Some WS2812 strips use GRB order. 
-    # If colors are swapped, change this to Color(g, r, b)
-    return Color(r, g, b)
+# Constants
+FIFO = "/tmp/led_fifo"
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-FIFO = "/tmp/led_fifo"
-
 @app.route('/api/color', methods=['POST'])
 def set_color():
     data = request.json
-    color_hex = data.get('color')
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+        
+    color_hex = data.get('color', '')
 
-    if not color_hex:
-        return jsonify({"error": "Invalid"}), 400
+    # STRICT VALIDATION: Must be # followed by exactly 6 hex characters
+    if not re.match(r'^#[0-9a-fA-F]{6}$', color_hex):
+        return jsonify({"error": "Invalid hex color format"}), 400
 
-    with open(FIFO, 'w') as fifo:
-        fifo.write(color_hex)
-
-    return jsonify({"status": "success"})
+    try:
+        # Write to FIFO only if validation passes
+        with open(FIFO, 'w') as fifo:
+            fifo.write(color_hex)
+        return jsonify({"status": "success", "received": color_hex})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
+    # Ensure FIFO exists before starting
+    if not os.path.exists(FIFO):
+        os.mkfifo(FIFO, 0o600) # Restricted permissions
     app.run(host='0.0.0.0', port=5000)
