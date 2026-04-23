@@ -4,9 +4,9 @@
     <title>LED Controller</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        body { font-family: sans-serif; text-align: center; background: #1a1a1a; color: white; padding-top: 50px; } [cite: 8, 9]
+        body { font-family: sans-serif; text-align: center; background: #1a1a1a; color: white; padding-top: 50px; }
         .container { display: flex; flex-direction: column; align-items: center; gap: 30px; }
-        input[type="color"] { width: 300px; height: 150px; border: none; cursor: pointer; background: none; } [cite: 10]
+        input[type="color"] { width: 300px; height: 150px; border: none; cursor: pointer; background: none; }
         input[type="range"] { width: 300px; cursor: pointer; }
     </style>
 </head>
@@ -15,7 +15,7 @@
     <div class="container">
         <div>
             <label>Color</label><br>
-            <input type="color" id="picker" value="#00ff00"> [cite: 12]
+            <input type="color" id="picker" value="#00ff00">
         </div>
         <div>
             <label>Brightness</label><br>
@@ -34,13 +34,13 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             })
-            .then(res => res.json()) [cite: 14, 15]
+            .then(res => res.json())
             .then(data => console.log('Success:', data))
-            .catch(err => console.error('Error:', err)); [cite: 15]
+            .catch(err => console.error('Error:', err));
         };
 
         picker.addEventListener('change', (e) => {
-            sendUpdate('/api/color', { color: e.target.value }); [cite: 14]
+            sendUpdate('/api/color', { color: e.target.value });
         });
 
         brightness.addEventListener('change', (e) => {

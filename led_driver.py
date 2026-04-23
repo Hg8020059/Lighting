@@ -49,16 +49,19 @@ os.chmod(FIFO, 0o666)
 print("LED Driver is running. Waiting for input...")
 
 try:
+    # Open the FIFO once for reading
     while True:
         with open(FIFO, 'r') as fifo:
-            data = fifo.read().strip()
-            if data:
-                # Check prefixes to determine which function to call
-                if data.startswith("C:"):
-                    set_color(data[2:])
-                elif data.startswith("B:"):
-                    set_brightness(data[2:])
-        time.sleep(0.01)
+            for line in fifo:
+                data = line.strip()
+                if data:
+                    if data.startswith("C:"):
+                        set_color(data[2:])
+                    elif data.startswith("B:"):
+                        set_brightness(data[2:])
+        # The 'with' block will only exit if the pipe is closed by the writer
+        # We sleep briefly before reopening to prevent CPU spiking
+        time.sleep(0.1)
 finally:
     for i in range(strip.numPixels()):
         strip.setPixelColor(i, Color(0,0,0))
