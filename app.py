@@ -19,15 +19,35 @@ def set_color():
         
     color_hex = data.get('color', '')
 
-    # STRICT VALIDATION: Must be # followed by exactly 6 hex characters
+    # Must be # followed by exactly 6 hex characters
     if not re.match(r'^#[0-9a-fA-F]{6}$', color_hex):
         return jsonify({"error": "Invalid hex color format"}), 400
 
     try:
-        # Write to FIFO only if validation passes
+        # write to fifo with C (color) prefix
         with open(FIFO, 'w') as fifo:
-            fifo.write(color_hex)
+            fifo.write(f"C:{color_hex}")
         return jsonify({"status": "success", "received": color_hex})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/brightness', methods=['POST'])
+def set_brightness():
+    data = request.json
+    if not data:
+         return jsonify({"error": "No data provided"}), 400
+         
+    brightness = data.get('brightness')
+    
+    # Validate brightness is between 0 and 255
+    if not isinstance(brightness, int) or not (0 <= brightness <= 255):
+         return jsonify({"error": "Invalid brightness value"}), 400
+         
+    try:
+        # write to fifo with B (Brightness) prefix
+        with open(FIFO, 'w') as fifo:
+            fifo.write(f"B:{brightness}")
+        return jsonify({"status": "success", "received": brightness})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

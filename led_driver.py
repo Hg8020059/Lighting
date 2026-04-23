@@ -13,15 +13,13 @@ LED_INVERT     = False
 LED_CHANNEL    = 0
 FIFO           = "/tmp/led_fifo"
 
-# Initialize Strip
 strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
 strip.begin()
 
 def set_color(hex_color):
-    """Parses hex and sets strip color with error handling."""
+    #Parses hex and sets strip color.
     try:
         hex_color = hex_color.lstrip('#')
-        # Robust conversion to RGB
         r = int(hex_color[0:2], 16)
         g = int(hex_color[2:4], 16)
         b = int(hex_color[4:6], 16)
@@ -33,31 +31,35 @@ def set_color(hex_color):
     except (ValueError, IndexError) as e:
         print(f"Error parsing color '{hex_color}': {e}")
 
-# Create FIFO with restricted permissions if it doesn't exist
-# If the pipe exists, remove it to ensure a clean start
+def set_brightness(level_str):
+    #Parses integer string and sets strip brightness.
+    try:
+        level = int(level_str)
+        strip.setBrightness(level)
+        strip.show()
+    except ValueError as e:
+        print(f"Error parsing brightness '{level_str}': {e}")
+
+# FIFO Setup
 if os.path.exists(FIFO):
     os.remove(FIFO)
-
-# Create the pipe
 os.mkfifo(FIFO)
-
-# IMPORTANT: Give the web user permission to write to it
-# 0o666 makes it readable/writable by everyone locally
 os.chmod(FIFO, 0o666)
 
 print("LED Driver is running. Waiting for input...")
 
 try:
     while True:
-        # Open the FIFO in read mode; this blocks until data is written
         with open(FIFO, 'r') as fifo:
             data = fifo.read().strip()
             if data:
-                set_color(data)
-        # Small sleep to prevent high CPU usage if the pipe behaves unexpectedly
+                # Check prefixes to determine which function to call
+                if data.startswith("C:"):
+                    set_color(data[2:])
+                elif data.startswith("B:"):
+                    set_brightness(data[2:])
         time.sleep(0.01)
 finally:
     for i in range(strip.numPixels()):
         strip.setPixelColor(i, Color(0,0,0))
     strip.show()
-

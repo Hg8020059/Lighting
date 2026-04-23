@@ -1,35 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>LED Color Picker</title>
+    <title>LED Controller</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        body { font-family: sans-serif; text-align: center; background: #1a1a1a; color: white; padding-top: 50px; }
-        input[type="color"] { 
-            width: 80%; max-width: 300px; height: 200px; 
-            border: none; cursor: pointer; background: none;
-        }
-        h1 { margin-bottom: 40px; }
+        body { font-family: sans-serif; text-align: center; background: #1a1a1a; color: white; padding-top: 50px; } [cite: 8, 9]
+        .container { display: flex; flex-direction: column; align-items: center; gap: 30px; }
+        input[type="color"] { width: 300px; height: 150px; border: none; cursor: pointer; background: none; } [cite: 10]
+        input[type="range"] { width: 300px; cursor: pointer; }
     </style>
 </head>
 <body>
-    <h1>Select LED Color</h1>
-    <input type="color" id="picker" value="#00ff00">
+    <h1>LED Controller</h1>
+    <div class="container">
+        <div>
+            <label>Color</label><br>
+            <input type="color" id="picker" value="#00ff00"> [cite: 12]
+        </div>
+        <div>
+            <label>Brightness</label><br>
+            <input type="range" id="brightness" min="0" max="255" value="80">
+        </div>
+    </div>
 
     <script>
         const picker = document.getElementById('picker');
-        
-        // Using 'change' instead of 'input' so it only sends 
-        // the command when you let go of the mouse/finger.
-        picker.addEventListener('change', (e) => {
-            fetch('/api/color', {
+        const brightness = document.getElementById('brightness');
+
+        // Helper to send data to our API
+        const sendUpdate = (endpoint, payload) => {
+            fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ color: e.target.value })
+                body: JSON.stringify(payload)
             })
-            .then(response => response.json())
+            .then(res => res.json()) [cite: 14, 15]
             .then(data => console.log('Success:', data))
-            .catch(error => console.error('Error:', error));
+            .catch(err => console.error('Error:', err)); [cite: 15]
+        };
+
+        picker.addEventListener('change', (e) => {
+            sendUpdate('/api/color', { color: e.target.value }); [cite: 14]
+        });
+
+        brightness.addEventListener('change', (e) => {
+            sendUpdate('/api/brightness', { brightness: parseInt(e.target.value) });
         });
     </script>
 </body>
