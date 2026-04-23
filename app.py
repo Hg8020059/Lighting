@@ -32,7 +32,4 @@ def set_color():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    # Ensure FIFO exists before starting
-    if not os.path.exists(FIFO):
-        os.mkfifo(FIFO, 0o600) # Restricted permissions
     app.run(host='0.0.0.0', port=5000)
