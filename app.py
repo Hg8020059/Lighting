@@ -50,6 +50,25 @@ def set_brightness():
         return jsonify({"status": "success", "received": brightness})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+        
+@app.route('/api/strobe', methods=['POST'])
+def toggle_strobe():
+    data = request.json
+    if data is None:
+         return jsonify({"error": "No data provided"}), 400
+         
+    # Get the boolean state from the frontend
+    is_strobing = data.get('strobe', False)
+    
+    try:
+        # Write to fifo with an 'S' prefix
+        # We send '1' for ON, and '0' for OFF
+        state = "1" if is_strobing else "0"
+        with open(FIFO, 'w') as fifo:
+            fifo.write(f"S:{state}")
+        return jsonify({"status": "success", "strobe": is_strobing})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500 
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
