@@ -15,6 +15,17 @@ FIFO = "/tmp/led_fifo"
 
 @app.route('/')
 
+import signal
+import sys
+
+# This tells the script to run the cleanup function when Systemd stops the service
+def cleanup(signum, frame):
+    # For the driver script, include: colorWipe(strip, Color(0,0,0), 10)
+    # For the web script, you can just exit
+    sys.exit(0)
+
+signal.signal(signal.SIGTERM, cleanup)
+
 def index():
 
     return render_template('index.html')
