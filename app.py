@@ -1,5 +1,7 @@
 import re
 import os
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from flask import Flask, request, jsonify, render_template
 
 app = Flask(__name__)
@@ -7,12 +9,20 @@ app = Flask(__name__)
 # Constants
 FIFO = "/tmp/led_fifo"
 
+def is_quiet_hours():
+    """Returns True if current Eastern Time is between 11 PM and 9 AM."""
+    now = datetime.now(ZoneInfo("America/New_York"))
+    return now.hour >= 23 or now.hour < 9
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/api/color', methods=['POST'])
 def set_color():
+    if is_quiet_hours():
+        return jsonify({"error": "LEDs are locked between 11:00 PM and 9:00 AM ET"}), 403
+
     data = request.json
     if not data:
         return jsonify({"error": "No data provided"}), 400
@@ -24,7 +34,6 @@ def set_color():
         return jsonify({"error": "Invalid hex color format"}), 400
 
     try:
-        # write to fifo with C (color) prefix
         with open(FIFO, 'w') as fifo:
             fifo.write(f"C:{color_hex}")
         return jsonify({"status": "success", "received": color_hex})
@@ -33,6 +42,9 @@ def set_color():
 
 @app.route('/api/brightness', methods=['POST'])
 def set_brightness():
+    if is_quiet_hours():
+        return jsonify({"error": "LEDs are locked between 11:00 PM and 9:00 AM ET"}), 403
+
     data = request.json
     if not data:
          return jsonify({"error": "No data provided"}), 400
@@ -44,7 +56,6 @@ def set_brightness():
          return jsonify({"error": "Invalid brightness value"}), 400
          
     try:
-        # write to fifo with B (Brightness) prefix
         with open(FIFO, 'w') as fifo:
             fifo.write(f"B:{brightness}")
         return jsonify({"status": "success", "received": brightness})
@@ -53,16 +64,16 @@ def set_brightness():
         
 @app.route('/api/strobe', methods=['POST'])
 def toggle_strobe():
+    if is_quiet_hours():
+        return jsonify({"error": "LEDs are locked between 11:00 PM and 9:00 AM ET"}), 403
+
     data = request.json
     if data is None:
          return jsonify({"error": "No data provided"}), 400
          
-    # Get the boolean state from the frontend
     is_strobing = data.get('strobe', False)
     
     try:
-        # Write to fifo with an 'S' prefix
-        # We send '1' for ON, and '0' for OFF
         state = "1" if is_strobing else "0"
         with open(FIFO, 'w') as fifo:
             fifo.write(f"S:{state}")
