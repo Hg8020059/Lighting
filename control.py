@@ -55,6 +55,9 @@ if __name__ == '__main__':
             flashbang(strip)
             strip.setBrightness(255)
             fill(strip, Color(222, 24, 186))
+        else:
+            # Force the lights off immediately if the service starts during quiet hours
+            colorWipe(strip, Color(0, 0, 0), 10)
             
         was_quiet = is_quiet_hours() # Track the state
 
