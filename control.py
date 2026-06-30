@@ -35,8 +35,16 @@ LED_INVERT     = False   # True to invert the signal (when using NPN transistor 
 LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
 
+import signal
+import sys
 
+# This tells the script to run the cleanup function when Systemd stops the service
+def cleanup(signum, frame):
+    colorWipe(strip, Color(0,0,0), 10)
+    # For the web script, you can just exit
+    sys.exit(0)
 
+signal.signal(signal.SIGTERM, cleanup)
 # Define functions which animate LEDs in various ways.
 
 def colorWipe(strip, color, wait_ms=50):
