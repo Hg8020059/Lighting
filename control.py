@@ -49,6 +49,15 @@ if __name__ == '__main__':
 
     print ('Press Ctrl-C to quit.')
 
+    # --- NEW: Wait for the Pi to sync its clock via the internet ---
+    while datetime.now().year < 2024:
+        time.sleep(2)
+    # ---------------------------------------------------------------
+
+    try:
+        # Initial startup sequence
+        if not is_quiet_hours():
+
     try:
         # Initial startup sequence
         if not is_quiet_hours():
